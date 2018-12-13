@@ -41,7 +41,7 @@ else:
 
 
 # -------- read arcgis training data ---------
-"""
+
 
 dataset = ogr.Open(os.path.join(path_train, 'training_samples_Arcgis.shp'))
 if not dataset:
@@ -155,7 +155,7 @@ classes = np.unique(roi)
 for c in classes:
     print('Class {c} contains {n} pixels'.format(c=c,
                                                  n=(roi == c).sum()))
-"""
+
 
 
 #------- opening the images -------------
