@@ -12,7 +12,11 @@ class PyImageClassifier:
         self.model_path     = model_path
         self.out_path       = out_path
 
+        self.img            = self.read_img_data()
         self.samples        = self.read_training_samples()
+
+        gdal.UseExceptions()
+        gdal.AllRegister()
 
     def set_img_path(self, img_path):
         
@@ -100,7 +104,22 @@ class PyImageClassifier:
                                                             datatype=field_defn.GetTypeName()))
 
             return dataset
-            
+
         else:
             logging.error("No sample path specified.")
+            return None
+
+    def read_img_data(self):
+
+        logging.debug("Reading image data...")
+        if self.img_path:
+            try:
+                img_ds = gdal.Open(self.img_path, gdal.GA_ReadOnly)
+                logging.debug("Successfully opened image data.")
+                return img_ds
+            except Exception as e:
+                logging.error('Failed to read image data: {e}'.format(e=e))
+                return None
+        else:
+            logging.error('No image path specified.')
             return None
