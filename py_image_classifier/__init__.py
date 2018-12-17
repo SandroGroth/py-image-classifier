@@ -98,6 +98,9 @@ class PyImageClassifier:
                 field_defn = defn.GetFieldDefn(i)
                 logging.debug('\t{name} - {datatype}'.format(name=field_defn.GetName(),
                                                             datatype=field_defn.GetTypeName()))
+
+            return dataset
+            
         else:
             logging.error("No sample path specified.")
             return None
