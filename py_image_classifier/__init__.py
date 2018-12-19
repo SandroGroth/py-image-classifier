@@ -1,6 +1,7 @@
 import logging
 import os
 
+from py_image_classifier import DataImporter
 from osgeo import ogr, gdal, gdal_array
 
 class PyImageClassifier:
@@ -12,11 +13,9 @@ class PyImageClassifier:
         self.model_path     = model_path
         self.out_path       = out_path
 
-        self.img            = self.read_img_data()
-        self.samples        = self.read_training_samples()
-
-        gdal.UseExceptions()
-        gdal.AllRegister()
+        self.importer       = DataImporter()
+        self.img            = self.importer.read_img_data(self.img_path)
+        self.samples        = self.importer.read_training_samples(self.sample_path)
 
     def set_img_path(self, img_path):
         
