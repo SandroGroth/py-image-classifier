@@ -11,6 +11,21 @@ class DataImporter:
         gdal.UseExceptions()
         gdal.AllRegister()
 
+    def read_img_data(self, img_path):
+
+        logging.debug("Reading image data...")
+        if img_path:
+            try:
+                img_ds = gdal.Open(img_path, gdal.GA_ReadOnly)
+                logging.debug("Successfully opened image data.")
+                return img_ds
+            except Exception as e:
+                logging.error('Failed to read image data: {e}'.format(e=e))
+                return None
+        else:
+            logging.error('No image path specified.')
+            return None
+    
     def read_training_samples(self, sample_path):
 
         logging.debug('Reading traning sample data.')

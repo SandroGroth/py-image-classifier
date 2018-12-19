@@ -14,7 +14,7 @@ class PyImageClassifier:
         self.out_path       = out_path
 
         self.importer       = DataImporter()
-        #self.img            = self.importer.read_img_data(self.img_path)
+        self.img            = self.importer.read_img_data(self.img_path)
         self.samples        = self.importer.read_training_samples(self.sample_path)
 
     def set_img_path(self, img_path):
@@ -50,20 +50,3 @@ class PyImageClassifier:
             self.out_path = out_path
         else:
             logging.error("Specified classification output path does not exist.")
-
-        return
-
-    def read_img_data(self):
-
-        logging.debug("Reading image data...")
-        if self.img_path:
-            try:
-                img_ds = gdal.Open(self.img_path, gdal.GA_ReadOnly)
-                logging.debug("Successfully opened image data.")
-                return img_ds
-            except Exception as e:
-                logging.error('Failed to read image data: {e}'.format(e=e))
-                return None
-        else:
-            logging.error('No image path specified.')
-            return None
