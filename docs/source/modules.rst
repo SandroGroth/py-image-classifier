@@ -5,3 +5,4 @@ py_image_classifier
    :maxdepth: 4
 
    py_image_classifier
+   py_image_classifier.importer

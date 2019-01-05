@@ -1,6 +1,7 @@
 import logging
 import os
 
+from py_image_classifier.importer import DataImporter
 from osgeo import ogr, gdal, gdal_array
 
 class PyImageClassifier:
@@ -12,11 +13,9 @@ class PyImageClassifier:
         self.model_path     = model_path
         self.out_path       = out_path
 
-        self.img            = self.read_img_data()
-        self.samples        = self.read_training_samples()
-
-        gdal.UseExceptions()
-        gdal.AllRegister()
+        self.importer       = DataImporter()
+        self.img            = self.importer.read_img_data(self.img_path)
+        self.samples        = self.importer.read_training_samples(self.sample_path)
 
     def set_img_path(self, img_path):
         
@@ -51,75 +50,3 @@ class PyImageClassifier:
             self.out_path = out_path
         else:
             logging.error("Specified classification output path does not exist.")
-
-        return
-
-    def read_training_samples(self):
-
-        logging.debug('Reading traning sample data.')
-        if self.sample_path:
-            try:
-                dataset = ogr.Open(self.sample_path)
-                if not dataset:
-                    logging.error('Could not open training data.')
-            except Exception as e:
-                logging.error('Failed to open training samples: {e}'.format(e=e))
-                return None
-
-            # getting dataset driver
-            driver = dataset.GetDriver()
-            logging.debug('Dataset driver is: {n}'.format(n=driver.name))
-
-            # checking layers in dataset
-            layer_count = dataset.GetLayerCount()
-            logging.debug('Number of layers in shapefile: {n}'.format(n=layer_count))
-
-            # getting name of the 1. layer
-            layer = dataset.GetLayerByIndex(0)
-            logging.debug('First layer name: {n}'.format(n=layer.GetName()))
-
-            # getting geometry info
-            geometry = layer.GetGeomType()
-            geometry_name = ogr.GeometryTypeToName(geometry)
-            logging.debug("Layer geometry: {geom}".format(geom=geometry_name))
-
-            # getting spatial reference info
-            spatial_ref = layer.GetSpatialRef()
-            proj4 = spatial_ref.ExportToProj4()
-            logging.debug('Spatial reference: {proj4}'.format(proj4=proj4))
-
-            # getting feature count
-            feature_count = layer.GetFeatureCount()
-            logging.debug('Feature count: {n}'.format(n=feature_count))
-
-            # getting field count
-            defn = layer.GetLayerDefn()
-            field_count = defn.GetFieldCount()
-            logging.debug('Field count: {n}'.format(n=field_count))
-
-            # getting field names
-            for i in range(field_count):
-                field_defn = defn.GetFieldDefn(i)
-                logging.debug('\t{name} - {datatype}'.format(name=field_defn.GetName(),
-                                                            datatype=field_defn.GetTypeName()))
-
-            return dataset
-
-        else:
-            logging.error("No sample path specified.")
-            return None
-
-    def read_img_data(self):
-
-        logging.debug("Reading image data...")
-        if self.img_path:
-            try:
-                img_ds = gdal.Open(self.img_path, gdal.GA_ReadOnly)
-                logging.debug("Successfully opened image data.")
-                return img_ds
-            except Exception as e:
-                logging.error('Failed to read image data: {e}'.format(e=e))
-                return None
-        else:
-            logging.error('No image path specified.')
-            return None
