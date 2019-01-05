@@ -5,6 +5,8 @@ import os
 from osgeo import ogr, gdal, gdal_array
 
 class DataImporter:
+    """Represents a toolset for importing the necessary data for an image classification.
+    """
 
     def __init__(self):
         
@@ -12,7 +14,19 @@ class DataImporter:
         gdal.AllRegister()
 
     def read_img_data(self, img_path):
+        """Reads the image data, that should be classified using gdal.
 
+        .. table::
+            :widths: auto
+
+            ================    ====================================================
+            Argument            Description
+            ----------------    ----------------------------------------------------
+            img_path            String. Path to image including filename.
+            ================    ====================================================
+
+        :return: gdal object -- The imported image data, None if failed.
+        """
         logging.debug("Reading image data...")
         if img_path:
             try:
@@ -27,7 +41,21 @@ class DataImporter:
             return None
     
     def read_training_samples(self, sample_path):
+        """Returns the trainng sample data. Data is opened using ogr and sample infos are checked.
 
+        Following sample data types are supported: ESRI shapefile
+
+        .. table::
+            :widths: auto
+
+            ================    =========================================================
+            Argument            Description
+            ----------------    ---------------------------------------------------------
+            sample_path         String. Path to training sample data including filename.
+            ================    =========================================================  
+
+        :return: ogr object -- =The imported training sample data. None if failed.     
+        """
         logging.debug('Reading traning sample data.')
         if sample_path:
             try:
