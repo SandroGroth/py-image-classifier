@@ -50,3 +50,45 @@ class PyImageClassifier:
             self.out_path = out_path
         else:
             logging.error("Specified classification output path does not exist.")
+
+    def rasterize_samples(self, attribute_name, out_path, file_name='training_raster'):
+        """
+        memory_driver == 'GTiff'
+        """
+        if not self.img:
+            logging.error("Iamge has to be imported.")
+            return None
+
+        # fetch resolution of img
+        ncol = self.img.RasterXSize
+        nrow = self.img.RasterYSize
+
+        # fetch extent and projection of img
+        proj = self.img.GetProjectionRef()
+        ext = self.img.GetGeoTransform()
+
+        # get the information layer
+        layer = self.samples.GetLayerByIndex(0)
+
+        # Create the raster dataset
+        driver = gdal.GetDriverByName('GTiff')
+        out_raster_ds = driver.Create(os.path.join(out_path, file_name + '.gtif'), ncol, nrow, 1, gdal.GDT_Byte)
+
+        # set same extent and projection as img
+        out_raster_ds.SetProjection(proj)
+        out_raster_ds.SetGeoTransform(ext)
+
+        # Fill our output band with the 0 blank, no class label, value
+        b = out_raster_ds.GetRasterBand(1)
+        b.Fill(0)
+
+        status = (out_raster_ds,  # output to our new dataset
+                    [1],  # output to our new dataset's first band
+                    layer,  # rasterize this layer
+                    None, None,  # don't worry about transformations since we're in same projection
+                    [0],  # burn value 0
+                    ['ALL_TOUCHED=TRUE',  # rasterize all pixels touched by polygons
+                    'ATTRIBUTE={}'.format(attribute_name)]  # put raster values according to the 'id' field values
+                    )
+
+        return status
